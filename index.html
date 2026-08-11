@@ -548,6 +548,7 @@
         <button class="btn btn-ghost" onclick="collapseAllNodes()">Contraer todos los módulos</button>
         <button class="btn btn-ghost" onclick="exportCSV()">Exportar a Excel (.csv)</button>
         <button class="btn btn-ghost" onclick="triggerImport()">Importar datos</button>
+        <button class="btn btn-ghost" onclick="forceLoadDefaults()">Cargar datos de esta versión</button>
         <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="handleImportFile(event)" />
       </div>
       <div class="legend">
@@ -933,6 +934,16 @@ function exportCSV(){
 
 function triggerImport(){
   document.getElementById('import-file-input').click();
+}
+
+async function forceLoadDefaults(){
+  const destino = isRemoteConfigured() ? 'en este navegador y en Google Sheets (para todos)' : 'en este navegador';
+  const ok = confirm('Esto reemplazará TODOS los datos actuales ' + destino + ' por los que trae esta versión del archivo (' + seedData().length + ' registros). No se puede deshacer. ¿Continuar?');
+  if(!ok) return;
+  people = seedData();
+  await saveData();
+  renderAll();
+  alert('Listo, se actualizaron los datos' + (isRemoteConfigured() ? ' y se sincronizaron con Google Sheets.' : '.'));
 }
 
 async function handleImportFile(e){
