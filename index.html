@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organigrama y Directorio — Comunidad</title>
+<style>
+  :root{
+    --navy:#1E2A44;
+    --navy-2:#2C3D5E;
+    --sage:#5C7A5C;
+    --sage-light:#E7EEE4;
+    --gold:#B8863B;
+    --gold-light:#F5EBD8;
+    --slate:#4A5468;
+    --slate-light:#E8EAEF;
+    --bg:#F6F4EF;
+    --card:#FFFFFF;
+    --line:#D8D4C8;
+    --text:#26241F;
+    --text-muted:#6B6558;
+    --danger:#B3462C;
+    --radius:10px;
+    --shadow:0 1px 3px rgba(30,42,68,0.08), 0 1px 2px rgba(30,42,68,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:0 0 4rem;
+  }
+  header.app-header{
+    background:var(--navy);
+    color:#fff;
+    padding:1.5rem 2rem 0;
+  }
+  .header-top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:1rem;
+    max-width:1080px;
+    margin:0 auto;
+  }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .brand .eyebrow{
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#B9C2D6;
+    font-weight:600;
+  }
+  .brand h1{
+    margin:0;
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .sync-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 0;
+    width:fit-content;
+  }
+  .sync-badge::before{
+    content:'';
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .sync-badge.sync-ok{color:#9FE1CB;}
+  .sync-badge.sync-ok::before{background:#5DCAA5;}
+  .sync-badge.sync-saving{color:#B9C2D6;}
+  .sync-badge.sync-saving::before{background:#B9C2D6;}
+  .sync-badge.sync-local{color:#FAC775;}
+  .sync-badge.sync-local::before{background:#FAC775;}
+  .sync-badge.sync-error{color:#F0997B;}
+  .sync-badge.sync-error::before{background:#F0997B;}
+  input#community-name{
+    background:transparent;
+    border:none;
+    color:#fff;
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    padding:0;
+    width:min(480px,60vw);
+    border-bottom:1px dashed rgba(255,255,255,0.35);
+  }
+  input#community-name:focus{outline:none;border-bottom-color:#fff;}
+  .tabs{
+    display:flex;
+    gap:4px;
+    margin-top:1.25rem;
+  }
+  .tab-btn{
+    background:transparent;
+    border:none;
+    color:#B9C2D6;
+    padding:10px 18px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    border-radius:8px 8px 0 0;
+    transition:background 0.15s, color 0.15s;
+  }
+  .tab-btn:hover{background:rgba(255,255,255,0.08);}
+  .tab-btn.active{background:var(--bg);color:var(--navy);}
+
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:1.75rem 2rem 0;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:1.25rem;
+  }
+  .toolbar-left{display:flex;gap:8px;flex-wrap:wrap;}
+  .legend{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    font-size:12px;
+    color:var(--text-muted);
+    flex-wrap:wrap;
+  }
+  .legend-item{display:flex;align-items:center;gap:6px;}
+  .legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  button{
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--navy);
+    transition:background 0.15s,border-color 0.15s;
+  }
+  .btn:hover{background:var(--slate-light);}
+  .btn-primary{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  .btn-primary:hover{background:var(--navy-2);}
+  .btn-ghost{
+    border-color:transparent;
+    background:transparent;
+    color:var(--slate);
+    padding:6px 10px;
+    font-size:13px;
+  }
+  .btn-ghost:hover{background:var(--slate-light);}
+  .btn-danger-ghost{color:var(--danger);}
+
+  /* ---- Organigrama tree ---- */
+  #tree-wrap{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:2rem 1rem;
+    overflow-x:auto;
+  }
+  .empty-state{
+    text-align:center;
+    padding:3rem 1rem;
+    color:var(--text-muted);
+  }
+  .empty-state h3{color:var(--text);margin-bottom:6px;font-size:16px;}
+  #tree-container{
+    display:block;
+    width:max-content;
+    min-width:100%;
+    text-align:left;
+  }
+  ul.org-tree{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:inline-flex;
+    justify-content:center;
+    padding-top:0;
+  }
+  ul.org-tree ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    justify-content:center;
+    padding-top:2.4rem;
+  }
+  ul.org-tree li{
+    position:relative;
+    padding:0 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+  ul.org-tree li::before, ul.org-tree li::after{
+    content:'';
+    position:absolute;
+    top:0;
+    border-top:2px solid var(--line);
+    width:50%;
+    height:1.2rem;
+  }
+  ul.org-tree li::before{right:50%;}
+  ul.org-tree li::after{left:50%;border-left:2px solid var(--line);}
+  ul.org-tree li:only-child::before, ul.org-tree li:only-child::after{display:none;}
+  ul.org-tree li:only-child{padding-top:0;}
+  ul.org-tree li:first-child::before, ul.org-tree li:last-child::after{border:0 none;}
+  ul.org-tree li:last-child::before{border-right:2px solid var(--line);border-radius:0 6px 0 0;}
+  ul.org-tree li:first-child::after{border-radius:6px 0 0 0;}
+  ul.org-tree > li{padding-top:0;}
+  ul.org-tree > li::before, ul.org-tree > li::after{display:none;}
+  ul.org-tree ul::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:50%;
+    border-left:2px solid var(--line);
+    width:0;
+    height:1.2rem;
+  }
+
+  .node{
+    display:inline-flex;
+    flex-direction:column;
+    gap:2px;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-left:5px solid var(--slate);
+    border-radius:8px;
+    padding:10px 16px;
+    min-width:168px;
+    max-width:220px;
+    position:relative;
+    box-shadow:var(--shadow);
+    cursor:grab;
+  }
+  .node.cat-directiva{border-left-color:var(--navy);}
+  .node.cat-administracion{border-left-color:var(--sage);}
+  .node.cat-personal{border-left-color:var(--gold);}
+  .node.dragging{opacity:0.35;cursor:grabbing;}
+  .node.drag-over{outline:2px dashed var(--navy);outline-offset:3px;background:var(--slate-light);}
+  .node.drag-invalid{outline:2px dashed var(--danger);outline-offset:3px;}
+  .node .n-role{font-weight:600;font-size:14px;color:var(--text);}
+  .node .n-name{font-size:12px;color:var(--text-muted);}
+  .node .n-actions{
+    display:flex;
+    gap:4px;
+    justify-content:center;
+    margin-top:6px;
+    opacity:0;
+    transition:opacity 0.15s;
+  }
+  .node:hover .n-actions{opacity:1;}
+  .n-actions button, .dept-actions button, .roster-actions button{
+    border:none;
+    background:var(--slate-light);
+    border-radius:5px;
+    width:22px;
+    height:22px;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--navy);
+    cursor:pointer;
+  }
+  .n-actions button:hover, .dept-actions button:hover, .roster-actions button:hover{background:var(--line);}
+  .n-actions .del:hover, .dept-actions .del:hover, .roster-actions .del:hover{background:#F6DCD3;color:var(--danger);}
+
+  .drag-hint{
+    font-size:12px;
+    color:var(--text-muted);
+    margin:-6px 0 12px;
+  }
+  #tree-wrap.root-drop-active{background:#FBFAF5;box-shadow:inset 0 0 0 2px var(--line);}
+
+  /* ---- Department card (módulo / gerencia) with internal roster ---- */
+  .dept-card{
+    text-align:left;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    min-width:250px;
+    width:max-content;
+    box-shadow:var(--shadow);
+    cursor:grab;
+  }
+  .dept-card.dragging{opacity:0.35;cursor:grabbing;}
+  .dept-card.drag-over{outline:2px dashed var(--navy);outline-offset:3px;}
+  .dept-card.drag-invalid{outline:2px dashed var(--danger);outline-offset:3px;}
+  .dept-card.cat-directiva{border-color:var(--navy);}
+  .dept-card.cat-administracion{border-color:var(--sage);}
+  .dept-card.cat-personal{border-color:var(--gold);}
+  .dept-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px 12px;
+    cursor:pointer;
+    border-radius:8px 8px 0 0;
+  }
+  .dept-card.cat-directiva .dept-header{background:#E4E8F0;}
+  .dept-card.cat-administracion .dept-header{background:var(--sage-light);}
+  .dept-card.cat-personal .dept-header{background:var(--gold-light);}
+  .dept-card.collapsed .dept-header{border-radius:8px;}
+  .dept-title-wrap{display:flex;align-items:center;gap:7px;min-width:0;}
+  .dept-title{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dept-card.cat-directiva .dept-title, .dept-card.cat-directiva .dept-chevron{color:var(--navy);}
+  .dept-card.cat-administracion .dept-title, .dept-card.cat-administracion .dept-chevron{color:var(--sage);}
+  .dept-card.cat-personal .dept-title, .dept-card.cat-personal .dept-chevron{color:var(--gold);}
+  .dept-count{font-size:11px;color:var(--text-muted);font-weight:600;flex-shrink:0;}
+  .dept-chevron{font-size:10px;transition:transform 0.15s;flex-shrink:0;}
+  .dept-card.collapsed .dept-chevron{transform:rotate(-90deg);}
+  .dept-card.collapsed .dept-body{display:none;}
+  .dept-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.15s;flex-shrink:0;}
+  .dept-card:hover .dept-actions{opacity:1;}
+  .dept-actions button{background:rgba(255,255,255,0.65);}
+  .dept-actions button:hover{background:#fff;}
+
+  .dept-body{padding:8px 12px 10px;}
+  .roster, .roster-sub{display:flex;flex-direction:column;}
+  .roster-sub{margin:6px 0 0 8px;padding:6px 0 0 10px;border-left:2px solid var(--line);}
+  .roster-subdepts{margin:8px 0 0 8px;padding-top:6px;}
+  .roster-subdepts .org-tree{padding-top:0;}
+  .roster-item{border-bottom:1px dashed var(--line);padding:6px 0;}
+  .roster-item:last-child{border-bottom:none;}
+  .roster-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:grab;
+  }
+  .roster-row.dragging{opacity:0.4;cursor:grabbing;}
+  .roster-row.drag-over{outline:2px dashed var(--navy);outline-offset:2px;border-radius:5px;}
+  .roster-row.drag-invalid{outline:2px dashed var(--danger);outline-offset:2px;border-radius:5px;}
+  .roster-info{min-width:0;flex:1;}
+  .r-name{display:block;font-weight:600;font-size:12.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .r-role{display:block;font-size:11px;color:var(--text-muted);}
+  .r-phone{font-size:11px;color:var(--navy);white-space:nowrap;flex-shrink:0;}
+  .roster-actions{display:flex;gap:3px;opacity:0;transition:opacity 0.15s;flex-shrink:0;}
+  .roster-row:hover .roster-actions{opacity:1;}
+  .roster-actions button{width:18px;height:18px;font-size:10px;}
+
+  .dept-footer{padding-top:6px;margin-top:4px;border-top:1px solid var(--line);}
+  .dept-add-link{
+    background:none;
+    border:none;
+    color:var(--navy);
+    font-size:11.5px;
+    font-weight:600;
+    padding:4px 0;
+    cursor:pointer;
+  }
+  .dept-add-link:hover{text-decoration:underline;}
+  .roster-empty{font-size:11.5px;color:var(--text-muted);font-style:italic;padding:2px 0 4px;}
+
+  .type-toggle{display:flex;gap:6px;}
+  .type-btn{
+    flex:1;
+    padding:8px 10px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--slate);
+    font-size:13px;
+    font-weight:600;
+  }
+  .type-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+  /* ---- Form modal ---- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(20,24,34,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:1rem;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;
+    border-radius:12px;
+    padding:1.5rem;
+    width:100%;
+    max-width:400px;
+    box-shadow:0 10px 40px rgba(20,24,34,0.25);
+  }
+  .modal h3{margin:0 0 4px;font-size:17px;}
+  .modal p.hint{margin:0 0 1rem;font-size:13px;color:var(--text-muted);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--slate);}
+  .field input, .field select{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--text);
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--navy);outline-offset:1px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:1.25rem;}
+
+  .confirm-modal .modal{max-width:340px;text-align:center;}
+  .confirm-modal .modal p{font-size:14px;color:var(--text-muted);}
+
+  /* ---- Directorio ---- */
+  .dir-search{
+    width:280px;
+    max-width:100%;
+    padding:9px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  table.dir-table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  table.dir-table th{
+    text-align:left;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--text-muted);
+    background:var(--slate-light);
+    padding:10px 14px;
+    font-weight:600;
+  }
+  table.dir-table td{
+    padding:11px 14px;
+    font-size:14px;
+    border-top:1px solid var(--line);
+    vertical-align:middle;
+  }
+  table.dir-table tr:hover td{background:#FBFAF7;}
+  .badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:20px;
+  }
+  .badge.cat-directiva{background:#E4E8F0;color:var(--navy);}
+  .badge.cat-administracion{background:var(--sage-light);color:var(--sage);}
+  .badge.cat-personal{background:var(--gold-light);color:var(--gold);}
+  td.phone-cell{white-space:nowrap;}
+  td.phone-cell a{color:var(--navy);text-decoration:none;font-weight:500;}
+  td.phone-cell a:hover{text-decoration:underline;}
+
+  footer.print-meta{display:none;}
+
+  @media print{
+    header.app-header .tabs, .toolbar, .drag-hint, .n-actions, .dept-actions, .roster-actions, .btn, .sync-badge{display:none !important;}
+    body{background:#fff;padding:0;}
+    header.app-header{
+      background:#fff !important;
+      color:#000 !important;
+      padding:0 0 1rem;
+      border-bottom:2px solid #000;
+    }
+    input#community-name{color:#000;border:none;width:auto;}
+    .brand .eyebrow{color:#444;}
+    main{padding:1rem 0 0;max-width:100%;}
+    #tree-wrap, table.dir-table{box-shadow:none;border:1px solid #ccc;}
+    .dept-card.collapsed .dept-body{display:block !important;}
+    .dept-chevron{display:none !important;}
+    .panel{display:none !important;}
+    .panel.print-target{display:block !important;}
+    footer.print-meta{
+      display:block;
+      font-size:11px;
+      color:#666;
+      margin-top:1.5rem;
+      border-top:1px solid #ccc;
+      padding-top:8px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-top">
+    <div class="brand">
+      <span class="eyebrow">Organigrama y directorio</span>
+      <input id="community-name" value="Comunidad Jardines de Vicuña Mackenna" />
+      <span id="sync-status" class="sync-badge sync-local">Guardado solo en este navegador</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="organigrama" onclick="switchTab('organigrama')">Organigrama</button>
+    <button class="tab-btn" data-tab="directorio" onclick="switchTab('directorio')">Directorio de contacto</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="panel active" id="panel-organigrama">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" onclick="openForm()">+ Agregar</button>
+        <button class="btn" onclick="printTab('organigrama')">Imprimir organigrama</button>
+        <button class="btn btn-ghost" onclick="expandAllNodes()">Expandir todos los módulos</button>
+        <button class="btn btn-ghost" onclick="collapseAllNodes()">Contraer todos los módulos</button>
+        <button class="btn btn-ghost" onclick="exportData()">Exportar datos (.json)</button>
+        <button class="btn btn-ghost" onclick="exportCSV()">Exportar a Excel (.csv)</button>
+        <button class="btn btn-ghost" onclick="triggerImport()">Importar datos</button>
+        <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="handleImportFile(event)" />
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:var(--navy)"></span>Directiva</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--sage)"></span>Administración</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Personal</span>
+      </div>
+    </div>
+    <p class="drag-hint">Arrastra un módulo o una persona sobre otro elemento para reasignar jerarquía. Haz clic en el nombre de un módulo para expandir o contraer su lista de integrantes.</p>
+    <div id="tree-wrap" ondragover="event.preventDefault(); tw_dragEnter();" ondrop="handleRootDrop(event)" ondragleave="tw_dragLeave(event)">
+      <div id="tree-container"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-directorio">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input type="text" class="dir-search" id="dir-search" placeholder="Buscar por nombre, cargo o teléfono" oninput="renderDirectorio()" />
+      </div>
+      <button class="btn" onclick="printTab('directorio')">Imprimir directorio</button>
+    </div>
+    <table class="dir-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Cargo</th>
+          <th>Categoría</th>
+          <th>Teléfono</th>
+          <th>Depende de</th>
+        </tr>
+      </thead>
+      <tbody id="dir-body"></tbody>
+    </table>
+  </section>
+
+  <footer class="print-meta">Generado el <span id="print-date"></span> — <span id="print-name"></span></footer>
+</main>
+
+<div class="modal-overlay" id="form-overlay">
+  <div class="modal">
+    <h3 id="form-title">Agregar</h3>
+    <p class="hint">Un módulo agrupa personas (ej. "Equipo de Limpieza"). Una persona tiene nombre, cargo y teléfono.</p>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="type-toggle">
+        <button type="button" class="type-btn active" data-type="persona" onclick="setFormType('persona')">Persona</button>
+        <button type="button" class="type-btn" data-type="departamento" onclick="setFormType('departamento')">Módulo / Departamento</button>
+      </div>
+    </div>
+    <div class="field" id="field-nombre">
+      <label for="f-nombre">Nombre completo</label>
+      <input id="f-nombre" type="text" placeholder="Ej: María Soto" />
+    </div>
+    <div class="field">
+      <label for="f-cargo" id="f-cargo-label">Cargo</label>
+      <input id="f-cargo" type="text" list="cargo-presets" placeholder="Ej: Presidenta del Comité" autocomplete="off" />
+      <datalist id="cargo-presets">
+        <option value="Comité de Administración">
+        <option value="Presidente(a) del Comité">
+        <option value="Secretario(a)">
+        <option value="Tesorero(a)">
+        <option value="Administrador(a)">
+        <option value="Conserje">
+        <option value="Portero(a)">
+        <option value="Personal de limpieza">
+        <option value="Supervisor(a) de limpieza">
+        <option value="Volante">
+        <option value="Mantención">
+      </datalist>
+      <datalist id="dept-presets">
+        <option value="Comité de Administración">
+        <option value="Administración">
+        <option value="Equipo de Limpieza">
+        <option value="Conserjería">
+        <option value="Seguridad">
+        <option value="Mantención">
+        <option value="Áreas Comunes">
+      </datalist>
+    </div>
+    <div class="field">
+      <label for="f-categoria">Categoría</label>
+      <select id="f-categoria">
+        <option value="directiva">Directiva</option>
+        <option value="administracion">Administración</option>
+        <option value="personal">Personal</option>
+      </select>
+    </div>
+    <div class="field" id="field-telefono">
+      <label for="f-telefono">Teléfono de contacto</label>
+      <input id="f-telefono" type="tel" placeholder="Ej: +56 9 1234 5678" />
+    </div>
+    <div class="field">
+      <label for="f-parent">Depende de</label>
+      <select id="f-parent">
+        <option value="">— Sin superior (nivel más alto) —</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" id="form-save-btn" onclick="savePerson()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay confirm-modal" id="confirm-overlay">
+  <div class="modal">
+    <h3>Eliminar persona</h3>
+    <p id="confirm-text">¿Seguro que quieres eliminar a esta persona? Quienes dependan de ella pasarán a depender de su superior directo.</p>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger);" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let people = [];
+let editingId = null;
+let deletingId = null;
+let collapsedDeptIds = new Set();
+const STORAGE_KEY = 'org-people';
+const NAME_KEY = 'org-community-name';
+const EDIT_KEY_STORAGE = 'org-edit-key';
+const hasClaudeStorage = (typeof window.storage !== 'undefined') && window.storage && typeof window.storage.get === 'function';
+
+// ---- CONFIGURACIÓN DE SINCRONIZACIÓN COMPARTIDA ----
+// Pega aquí la URL de tu Web App de Google Apps Script (ver Code.gs adjunto).
+// Mientras diga 'PEGA_AQUI_TU_URL', la herramienta funciona solo en este navegador.
+const APPS_SCRIPT_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
+
+function isRemoteConfigured(){
+  return !!APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PEGA_AQUI') === -1;
+}
+
+const CATEGORY_LABELS = {directiva:'Directiva', administracion:'Administración', personal:'Personal'};
+
+function uid(){return 'p_' + Math.random().toString(36).slice(2,10);}
+
+async function storageGet(key){
+  if(hasClaudeStorage){
+    try{
+      const r = await window.storage.get(key, true);
+      return r ? r.value : null;
+    }catch(e){ /* fall through to localStorage */ }
+  }
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+
+async function storageSet(key, value){
+  if(hasClaudeStorage){
+    try{ await window.storage.set(key, value, true); }catch(e){ /* fall through */ }
+  }
+  try{ localStorage.setItem(key, value); }catch(e){ console.error('No se pudo guardar', e); }
+}
+
+function setSyncStatus(state){
+  const el = document.getElementById('sync-status');
+  if(!el) return;
+  if(state === 'synced'){
+    el.textContent = 'Sincronizado con Google Sheets';
+    el.className = 'sync-badge sync-ok';
+  }else if(state === 'saving'){
+    el.textContent = 'Guardando…';
+    el.className = 'sync-badge sync-saving';
+  }else if(state === 'error'){
+    el.textContent = 'No se pudo sincronizar (guardado solo local)';
+    el.className = 'sync-badge sync-error';
+  }else if(state === 'local'){
+    el.textContent = 'Guardado solo en este navegador';
+    el.className = 'sync-badge sync-local';
+  }
+}
+
+async function remoteLoad(){
+  if(!isRemoteConfigured()) return null;
+  try{
+    const res = await fetch(APPS_SCRIPT_URL, {method:'GET'});
+    if(!res.ok) throw new Error('bad status');
+    return await res.json();
+  }catch(e){
+    console.error('No se pudo cargar desde Google Sheets', e);
+    return null;
+  }
+}
+
+function getStoredEditKey(){
+  try{ return localStorage.getItem(EDIT_KEY_STORAGE) || ''; }catch(e){ return ''; }
+}
+function setStoredEditKey(k){
+  try{ localStorage.setItem(EDIT_KEY_STORAGE, k); }catch(e){}
+}
+
+async function remoteSave(){
+  if(!isRemoteConfigured()) return true;
+  let editKey = getStoredEditKey();
+  if(!editKey){
+    editKey = window.prompt('Clave de edición del organigrama (te la pasó quien lo configuró):') || '';
+    setStoredEditKey(editKey);
+  }
+  setSyncStatus('saving');
+  try{
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        people: people,
+        communityName: document.getElementById('community-name').value,
+        editKey: editKey
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(data && data.error === 'unauthorized'){
+      alert('La clave de edición no es correcta. Vuelve a intentarlo.');
+      setStoredEditKey('');
+      setSyncStatus('error');
+      return false;
+    }
+    setSyncStatus('synced');
+    return true;
+  }catch(e){
+    console.error('No se pudo guardar en Google Sheets', e);
+    setSyncStatus('error');
+    return false;
+  }
+}
+
+async function loadData(){
+  let usedRemote = false;
+  if(isRemoteConfigured()){
+    const remote = await remoteLoad();
+    if(remote && Array.isArray(remote.people)){
+      if(remote.people.length){
+        people = remote.people;
+        if(remote.communityName){
+          document.getElementById('community-name').value = remote.communityName;
+        }
+        usedRemote = true;
+        setSyncStatus('synced');
+      }else{
+        // Sheet vacía todavía: partimos con lo que haya localmente (o el ejemplo) y lo publicamos.
+        people = await loadLocalFallback();
+        usedRemote = true;
+        setSyncStatus('saving');
+        await remoteSave();
+      }
+    }else{
+      setSyncStatus('error');
+    }
+  }
+  if(!usedRemote){
+    people = await loadLocalFallback();
+    setSyncStatus(isRemoteConfigured() ? 'error' : 'local');
+  }
+  renderAll();
+}
+
+async function loadLocalFallback(){
+  let result;
+  try{
+    const raw = await storageGet(STORAGE_KEY);
+    result = raw ? JSON.parse(raw) : seedData();
+  }catch(e){
+    result = seedData();
+  }
+  try{
+    const savedName = await storageGet(NAME_KEY);
+    if(savedName){
+      document.getElementById('community-name').value = savedName;
+    }
+  }catch(e){}
+  return result;
+}
+
+function seedData(){
+  return [
+    {id:'p_001', tipo:'departamento', nombre:'', cargo:'Comité de Administración', categoria:'directiva', telefono:'', parentId:null},
+    {id:'p_002', tipo:'persona', nombre:'Sergio Ríos', cargo:'Presidente', categoria:'directiva', telefono:'+56 9 1111 1111', parentId:'p_001'},
+    {id:'p_003', tipo:'persona', nombre:'Javiera Araya', cargo:'Secretaria', categoria:'directiva', telefono:'+56 9 2222 2222', parentId:'p_001'},
+    {id:'p_004', tipo:'persona', nombre:'Gunter Redel', cargo:'Tesorero', categoria:'directiva', telefono:'+56 9 3333 3333', parentId:'p_001'},
+    {id:'p_005', tipo:'departamento', nombre:'', cargo:'Administración', categoria:'administracion', telefono:'', parentId:'p_001'},
+    {id:'p_006', tipo:'persona', nombre:'Arturo Salinas', cargo:'Administrador(a)', categoria:'administracion', telefono:'', parentId:'p_005'},
+    {id:'p_007', tipo:'departamento', nombre:'', cargo:'Equipo de Limpieza', categoria:'personal', telefono:'', parentId:'p_005'},
+    {id:'p_008', tipo:'persona', nombre:'Isabel Díaz', cargo:'Supervisor(a) de limpieza', categoria:'personal', telefono:'', parentId:'p_007'},
+    {id:'p_010', tipo:'departamento', nombre:'', cargo:'Conserjería', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_011', tipo:'persona', nombre:'Susana Pasmiño', cargo:'Conserje (turno día) Torre A', categoria:'personal', telefono:'+56 9 6538 2035', parentId:'p_010'},
+    {id:'p_012', tipo:'persona', nombre:'Eugenia Mallea', cargo:'Conserje (turno día) Torre B', categoria:'personal', telefono:'+56 9 6524 5541', parentId:'p_010'},
+    {id:'p_013', tipo:'persona', nombre:'Ana Montenegro', cargo:'Conserje (turno día) Torre C', categoria:'personal', telefono:'+56 9 5085 3959', parentId:'p_010'},
+    {id:'p_014', tipo:'persona', nombre:'Juan Carlos Ramirez', cargo:'Conserje (turno día) Torre D', categoria:'personal', telefono:'+56 9 8739 7794', parentId:'p_010'},
+    {id:'p_015', tipo:'persona', nombre:'Matias Rojas', cargo:'Conserje Semana', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_016', tipo:'persona', nombre:'Roberto Ramirez', cargo:'Conserje Semana', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_017', tipo:'persona', nombre:'Isabella Perez', cargo:'Conserje Semana', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_018', tipo:'persona', nombre:'Eduardo Gonzalez', cargo:'Conserje (turno noche)', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_019', tipo:'persona', nombre:'Carolina Lopez', cargo:'Conserje (turno noche)', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_020', tipo:'persona', nombre:'Juan Licanan', cargo:'Conserje (turno noche)', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_021', tipo:'persona', nombre:'Francisco Nuñez', cargo:'Conserje (turno noche)', categoria:'personal', telefono:'', parentId:'p_010'},
+    {id:'p_022', tipo:'departamento', nombre:'', cargo:'Volantes', categoria:'personal', telefono:'', parentId:'p_005'},
+    {id:'p_023', tipo:'persona', nombre:'Ninoska Valenzuela', cargo:'Volante', categoria:'personal', telefono:'+56 9 2778 1643', parentId:'p_022'},
+    {id:'p_024', tipo:'persona', nombre:'Sergio Rivera', cargo:'Volante', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_025', tipo:'persona', nombre:'Alex Venegas', cargo:'Volante (noche)', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_026', tipo:'persona', nombre:'Emanuel Lagos', cargo:'Volante', categoria:'personal', telefono:'+56 9 4212 7411', parentId:'p_022'},
+    {id:'p_027', tipo:'persona', nombre:'Alfonso Araneda', cargo:'Volante fin de semana', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_028', tipo:'persona', nombre:'Jeyson Millas', cargo:'Volante fin de semana', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_029', tipo:'departamento', nombre:'', cargo:'Mantención', categoria:'personal', telefono:'', parentId:'p_005'},
+    {id:'p_030', tipo:'persona', nombre:'Victor Palma', cargo:'Personal de mantención', categoria:'personal', telefono:'', parentId:'p_029'},
+    {id:'p_031', tipo:'departamento', nombre:'', cargo:'Porteria', categoria:'personal', telefono:'', parentId:'p_022'},
+    {id:'p_032', tipo:'persona', nombre:'Lorenzo Mejias', cargo:'Portero(a) Santa Elena', categoria:'personal', telefono:'+56 9 6557 2804', parentId:'p_031'},
+    {id:'p_033', tipo:'persona', nombre:'Jurber Govia', cargo:'Portero(a) Central', categoria:'personal', telefono:'+56 9 3328 1334', parentId:'p_031'},
+    {id:'p_034', tipo:'persona', nombre:'Javier Avila', cargo:'Portero(a) Central', categoria:'personal', telefono:'', parentId:'p_031'},
+    {id:'p_035', tipo:'persona', nombre:'Juan Carlos Gonzalez', cargo:'Portero(a) Santa Elena', categoria:'personal', telefono:'', parentId:'p_031'},
+    {id:'p_036', tipo:'departamento', nombre:'', cargo:'Personal de Aseo', categoria:'personal', telefono:'', parentId:'p_007'},
+    {id:'p_037', tipo:'departamento', nombre:'', cargo:'Personal de Reciclaje', categoria:'personal', telefono:'', parentId:'p_007'}
+  ];
+}
+
+async function saveData(){
+  await storageSet(STORAGE_KEY, JSON.stringify(people));
+  await storageSet(NAME_KEY, document.getElementById('community-name').value);
+  if(isRemoteConfigured()){
+    await remoteSave();
+  }else{
+    setSyncStatus('local');
+  }
+}
+
+async function saveCommunityName(){
+  await saveData();
+}
+document.getElementById('community-name').addEventListener('change', saveCommunityName);
+
+function exportData(){
+  const payload = {
+    communityName: document.getElementById('community-name').value,
+    people: people
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'organigrama-datos.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function csvEscape(v){
+  v = (v === null || v === undefined) ? '' : String(v);
+  if(/[",\n\r]/.test(v)){
+    return '"' + v.replace(/"/g,'""') + '"';
+  }
+  return v;
+}
+
+function exportCSV(){
+  const byId = Object.fromEntries(people.map(p => [p.id, p]));
+  const rows = [['Tipo','Nombre visible','Cargo','Categoría','Teléfono','Depende de']];
+  people.forEach(p => {
+    const tipo = p.tipo === 'departamento' ? 'Módulo' : 'Persona';
+    const nombreVisible = p.tipo === 'departamento' ? p.cargo : p.nombre;
+    const cargo = p.tipo === 'departamento' ? '' : p.cargo;
+    const categoria = CATEGORY_LABELS[p.categoria] || p.categoria;
+    let dependeDe = '';
+    if(p.parentId && byId[p.parentId]){
+      const parent = byId[p.parentId];
+      dependeDe = parent.tipo === 'departamento' ? parent.cargo : parent.nombre;
+    }
+    rows.push([tipo, nombreVisible, cargo, categoria, p.telefono || '', dependeDe]);
+  });
+  const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'organigrama-datos.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function triggerImport(){
+  document.getElementById('import-file-input').click();
+}
+
+async function handleImportFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(payload && Array.isArray(payload.people)){
+      people = payload.people;
+      if(payload.communityName){
+        document.getElementById('community-name').value = payload.communityName;
+        await saveCommunityName();
+      }
+      await saveData();
+      renderAll();
+    }else{
+      alert('El archivo no tiene el formato esperado. Debe ser un JSON exportado desde esta misma herramienta.');
+    }
+  }catch(err){
+    alert('No se pudo leer el archivo. Asegúrate de que sea un JSON exportado desde esta misma herramienta.');
+  }
+  e.target.value = '';
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('panel-organigrama').classList.toggle('active', tab === 'organigrama');
+  document.getElementById('panel-directorio').classList.toggle('active', tab === 'directorio');
+}
+
+function printTab(tab){
+  document.getElementById('panel-organigrama').classList.remove('print-target');
+  document.getElementById('panel-directorio').classList.remove('print-target');
+  document.getElementById(tab === 'organigrama' ? 'panel-organigrama' : 'panel-directorio').classList.add('print-target');
+  document.getElementById('print-date').textContent = new Date().toLocaleDateString('es-CL', {year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('print-name').textContent = document.getElementById('community-name').value;
+  window.print();
+}
+
+function renderAll(){
+  renderTree();
+  renderDirectorio();
+  fillParentSelect();
+}
+
+function renderTree(){
+  const container = document.getElementById('tree-container');
+  if(people.length === 0){
+    container.innerHTML = '<div class="empty-state"><h3>Aún no hay personas registradas</h3><p>Usa "Agregar persona" para empezar a construir el organigrama.</p></div>';
+    return;
+  }
+  const roots = people.filter(p => !p.parentId);
+  container.innerHTML = '<ul class="org-tree">' + roots.map(p => renderNode(p)).join('') + '</ul>';
+  setTimeout(centerTreeScroll, 0);
+}
+
+function centerTreeScroll(){
+  const wrap = document.getElementById('tree-wrap');
+  wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2);
+}
+
+let draggedId = null;
+
+function handleDragStart(e, id){
+  draggedId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  e.currentTarget.classList.add('dragging');
+}
+
+function handleDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.drag-over,.drag-invalid').forEach(el => el.classList.remove('drag-over','drag-invalid'));
+  document.getElementById('tree-wrap').classList.remove('root-drop-active');
+  draggedId = null;
+}
+
+function handleDragOver(e, targetId){
+  e.preventDefault();
+  e.stopPropagation();
+  if(!draggedId || draggedId === targetId || isDescendant(targetId, draggedId)){
+    e.currentTarget.classList.add('drag-invalid');
+    e.dataTransfer.dropEffect = 'none';
+    return;
+  }
+  e.currentTarget.classList.add('drag-over');
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragLeaveNode(e){
+  e.currentTarget.classList.remove('drag-over','drag-invalid');
+}
+
+async function handleDrop(e, targetId){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.remove('drag-over','drag-invalid');
+  const sourceId = draggedId || e.dataTransfer.getData('text/plain');
+  if(!sourceId || sourceId === targetId) return;
+  if(isDescendant(targetId, sourceId)) return;
+  const person = people.find(p => p.id === sourceId);
+  if(person){
+    person.parentId = targetId;
+    await saveData();
+    renderAll();
+  }
+}
+
+function tw_dragEnter(){
+  if(draggedId) document.getElementById('tree-wrap').classList.add('root-drop-active');
+}
+function tw_dragLeave(e){
+  if(e.target.id === 'tree-wrap') document.getElementById('tree-wrap').classList.remove('root-drop-active');
+}
+
+async function handleRootDrop(e){
+  e.preventDefault();
+  document.getElementById('tree-wrap').classList.remove('root-drop-active');
+  const sourceId = draggedId || e.dataTransfer.getData('text/plain');
+  if(!sourceId) return;
+  const person = people.find(p => p.id === sourceId);
+  if(person && person.parentId !== null){
+    person.parentId = null;
+    await saveData();
+    renderAll();
+  }
+}
+
+function renderNode(node){
+  let cardHtml = node.tipo === 'departamento' ? renderDeptCard(node) : renderStandaloneCard(node);
+  const deptChildren = people.filter(p => p.parentId === node.id && p.tipo === 'departamento');
+  let html = '<li>' + cardHtml;
+  if(deptChildren.length){
+    html += '<ul>' + deptChildren.map(c => renderNode(c)).join('') + '</ul>';
+  }
+  html += '</li>';
+  return html;
+}
+
+function renderDeptCard(node){
+  const personaChildren = people.filter(p => p.parentId === node.id && p.tipo === 'persona');
+  const totalMembers = countRosterMembers(personaChildren);
+  const collapsed = collapsedDeptIds.has(node.id);
+  let html = '<div class="dept-card cat-' + node.categoria + (collapsed ? ' collapsed' : '') + '" draggable="true" data-id="' + node.id + '"' +
+    ' ondragstart="handleDragStart(event,\'' + node.id + '\')"' +
+    ' ondragend="handleDragEnd(event)"' +
+    ' ondragover="handleDragOver(event,\'' + node.id + '\')"' +
+    ' ondragleave="handleDragLeaveNode(event)"' +
+    ' ondrop="handleDrop(event,\'' + node.id + '\')">';
+  html += '<div class="dept-header" onclick="toggleDept(event,\'' + node.id + '\')">';
+  html += '<div class="dept-title-wrap"><span class="dept-chevron">&#9660;</span><span class="dept-title">' + escapeHtml(node.cargo) + '</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:6px;">';
+  html += '<span class="dept-count">' + totalMembers + '</span>';
+  html += '<div class="dept-actions">';
+  html += '<button title="Editar módulo" onclick="event.stopPropagation();openForm(\'' + node.id + '\')">&#9998;</button>';
+  html += '<button title="Agregar sub-módulo" onclick="event.stopPropagation();openForm(null,\'' + node.id + '\',\'departamento\')">&#43;</button>';
+  html += '<button class="del" title="Eliminar módulo" onclick="event.stopPropagation();askDelete(\'' + node.id + '\')">&times;</button>';
+  html += '</div></div></div>';
+  html += '<div class="dept-body">';
+  html += renderRoster(personaChildren, false);
+  html += '<div class="dept-footer"><button class="dept-add-link" onclick="openForm(null,\'' + node.id + '\',\'persona\')">+ Agregar persona</button></div>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function countRosterMembers(personaNodes){
+  let count = personaNodes.length;
+  personaNodes.forEach(p => {
+    count += countRosterMembers(people.filter(c => c.parentId === p.id && c.tipo === 'persona'));
+  });
+  return count;
+}
+
+function renderRoster(personaNodes, nested){
+  if(!personaNodes.length){
+    return nested ? '' : '<p class="roster-empty">Aún no hay personas en este módulo.</p>';
+  }
+  const cls = nested ? 'roster-sub' : 'roster';
+  return '<div class="' + cls + '">' + personaNodes.map(p => renderRosterItem(p)).join('') + '</div>';
+}
+
+function renderRosterItem(p){
+  const subs = people.filter(c => c.parentId === p.id && c.tipo === 'persona');
+  const subDepts = people.filter(c => c.parentId === p.id && c.tipo === 'departamento');
+  const displayName = p.nombre ? escapeHtml(p.nombre) : '<span style="font-style:italic;">Sin nombre asignado</span>';
+  let html = '<div class="roster-item">';
+  html += '<div class="roster-row" draggable="true" data-id="' + p.id + '"' +
+    ' ondragstart="handleDragStart(event,\'' + p.id + '\')"' +
+    ' ondragend="handleDragEnd(event)"' +
+    ' ondragover="handleDragOver(event,\'' + p.id + '\')"' +
+    ' ondragleave="handleDragLeaveNode(event)"' +
+    ' ondrop="handleDrop(event,\'' + p.id + '\')">';
+  html += '<div class="roster-info"><span class="r-name">' + displayName + '</span><span class="r-role">' + escapeHtml(p.cargo) + '</span></div>';
+  html += '<span class="r-phone">' + (p.telefono ? escapeHtml(p.telefono) : '—') + '</span>';
+  html += '<div class="roster-actions">';
+  html += '<button title="Editar" onclick="openForm(\'' + p.id + '\')">&#9998;</button>';
+  html += '<button title="Agregar bajo esta persona" onclick="openForm(null,\'' + p.id + '\',\'persona\')">+</button>';
+  html += '<button class="del" title="Eliminar" onclick="askDelete(\'' + p.id + '\')">&times;</button>';
+  html += '</div></div>';
+  if(subs.length){
+    html += renderRoster(subs, true);
+  }
+  if(subDepts.length){
+    html += '<div class="roster-subdepts"><ul class="org-tree">' + subDepts.map(d => renderNode(d)).join('') + '</ul></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderStandaloneCard(p){
+  const displayName = p.nombre ? escapeHtml(p.nombre) : '<span style="font-style:italic;">Sin nombre asignado</span>';
+  let html = '<div class="node cat-' + p.categoria + '" draggable="true" data-id="' + p.id + '"' +
+    ' ondragstart="handleDragStart(event,\'' + p.id + '\')"' +
+    ' ondragend="handleDragEnd(event)"' +
+    ' ondragover="handleDragOver(event,\'' + p.id + '\')"' +
+    ' ondragleave="handleDragLeaveNode(event)"' +
+    ' ondrop="handleDrop(event,\'' + p.id + '\')">';
+  html += '<span class="n-role">' + escapeHtml(p.cargo) + '</span>';
+  html += '<span class="n-name">' + displayName + '</span>';
+  if(p.telefono){
+    html += '<span class="n-name" style="color:var(--navy);">' + escapeHtml(p.telefono) + '</span>';
+  }
+  html += '<div class="n-actions">';
+  html += '<button title="Editar" onclick="openForm(\'' + p.id + '\')">&#9998;</button>';
+  html += '<button title="Agregar" onclick="openForm(null,\'' + p.id + '\',\'persona\')">+</button>';
+  html += '<button class="del" title="Eliminar" onclick="askDelete(\'' + p.id + '\')">&times;</button>';
+  html += '</div></div>';
+  return html;
+}
+
+function toggleDept(e, id){
+  e.stopPropagation();
+  if(collapsedDeptIds.has(id)) collapsedDeptIds.delete(id);
+  else collapsedDeptIds.add(id);
+  renderTree();
+}
+
+function expandAllNodes(){
+  collapsedDeptIds.clear();
+  renderTree();
+}
+
+function collapseAllNodes(){
+  people.filter(p => p.tipo === 'departamento').forEach(p => collapsedDeptIds.add(p.id));
+  renderTree();
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function renderDirectorio(){
+  const q = (document.getElementById('dir-search').value || '').toLowerCase();
+  const byId = Object.fromEntries(people.map(p => [p.id, p]));
+  const rows = people
+    .filter(p => p.tipo !== 'departamento')
+    .filter(p => (p.nombre + ' ' + p.cargo + ' ' + p.telefono).toLowerCase().includes(q))
+    .sort((a,b) => a.cargo.localeCompare(b.cargo));
+  const body = document.getElementById('dir-body');
+  if(rows.length === 0){
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">No hay resultados.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(p => {
+    const parentName = p.parentId && byId[p.parentId] ? (byId[p.parentId].nombre || byId[p.parentId].cargo) : '—';
+    const phoneDigits = (p.telefono || '').replace(/[^\d+]/g,'');
+    const phoneCell = p.telefono
+      ? '<a href="tel:' + phoneDigits + '">' + escapeHtml(p.telefono) + '</a>'
+      : '<span style="color:var(--text-muted);">Sin registrar</span>';
+    return '<tr>' +
+      '<td>' + (p.nombre ? escapeHtml(p.nombre) : '<span style="color:var(--text-muted);font-style:italic;">Sin nombre</span>') + '</td>' +
+      '<td>' + escapeHtml(p.cargo) + '</td>' +
+      '<td><span class="badge cat-' + p.categoria + '">' + CATEGORY_LABELS[p.categoria] + '</span></td>' +
+      '<td class="phone-cell">' + phoneCell + '</td>' +
+      '<td>' + escapeHtml(parentName) + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function fillParentSelect(excludeId){
+  const select = document.getElementById('f-parent');
+  const current = select.value;
+  select.innerHTML = '<option value="">— Sin superior (nivel más alto) —</option>';
+  people
+    .filter(p => p.id !== excludeId && !isDescendant(p.id, excludeId))
+    .sort((a,b) => a.cargo.localeCompare(b.cargo))
+    .forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      const label = (p.nombre ? p.nombre + ' — ' : '') + p.cargo;
+      opt.textContent = p.tipo === 'departamento' ? label + ' (módulo)' : label;
+      select.appendChild(opt);
+    });
+  select.value = current;
+}
+
+function isDescendant(candidateId, ancestorId){
+  if(!ancestorId) return false;
+  let node = people.find(p => p.id === candidateId);
+  while(node && node.parentId){
+    if(node.parentId === ancestorId) return true;
+    node = people.find(p => p.id === node.parentId);
+  }
+  return false;
+}
+
+let currentFormType = 'persona';
+
+function setFormType(type){
+  currentFormType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  const isDept = type === 'departamento';
+  document.getElementById('field-nombre').style.display = isDept ? 'none' : 'block';
+  document.getElementById('field-telefono').style.display = isDept ? 'none' : 'block';
+  document.getElementById('f-cargo-label').textContent = isDept ? 'Nombre del módulo' : 'Cargo';
+  document.getElementById('f-cargo').setAttribute('list', isDept ? 'dept-presets' : 'cargo-presets');
+  document.getElementById('f-cargo').placeholder = isDept ? 'Ej: Equipo de Limpieza' : 'Ej: Presidenta del Comité';
+}
+
+function openForm(id, presetParentId, presetType){
+  editingId = id || null;
+  fillParentSelect(id);
+  if(id){
+    const p = people.find(x => x.id === id);
+    setFormType(p.tipo === 'departamento' ? 'departamento' : 'persona');
+    document.getElementById('form-title').textContent = p.tipo === 'departamento' ? 'Editar módulo' : 'Editar persona';
+    document.getElementById('f-nombre').value = p.nombre;
+    document.getElementById('f-cargo').value = p.cargo;
+    document.getElementById('f-categoria').value = p.categoria;
+    document.getElementById('f-telefono').value = p.telefono;
+    document.getElementById('f-parent').value = p.parentId || '';
+  }else{
+    setFormType(presetType || 'persona');
+    document.getElementById('form-title').textContent = 'Agregar';
+    document.getElementById('f-nombre').value = '';
+    document.getElementById('f-cargo').value = '';
+    document.getElementById('f-categoria').value = 'directiva';
+    document.getElementById('f-telefono').value = '';
+    document.getElementById('f-parent').value = presetParentId || '';
+  }
+  document.getElementById('form-overlay').classList.add('open');
+  document.getElementById('f-nombre').focus();
+}
+
+function closeForm(){
+  document.getElementById('form-overlay').classList.remove('open');
+  editingId = null;
+}
+
+async function savePerson(){
+  const cargo = document.getElementById('f-cargo').value.trim();
+  if(!cargo){
+    document.getElementById('f-cargo').focus();
+    return;
+  }
+  const data = {
+    tipo: currentFormType,
+    nombre: currentFormType === 'departamento' ? '' : document.getElementById('f-nombre').value.trim(),
+    cargo: cargo,
+    categoria: document.getElementById('f-categoria').value,
+    telefono: currentFormType === 'departamento' ? '' : document.getElementById('f-telefono').value.trim(),
+    parentId: document.getElementById('f-parent').value || null
+  };
+  if(editingId){
+    const idx = people.findIndex(p => p.id === editingId);
+    people[idx] = {...people[idx], ...data};
+  }else{
+    people.push({id: uid(), ...data});
+  }
+  await saveData();
+  renderAll();
+  closeForm();
+}
+
+function askDelete(id){
+  deletingId = id;
+  const p = people.find(x => x.id === id);
+  const hasChildren = people.some(c => c.parentId === id);
+  const label = p.nombre || p.cargo;
+  document.getElementById('confirm-text').textContent = hasChildren
+    ? '¿Eliminar "' + label + '"? Lo que depende de esto pasará a depender de su superior directo.'
+    : '¿Eliminar "' + label + '"? Esta acción no se puede deshacer.';
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  deletingId = null;
+}
+
+async function confirmDelete(){
+  const p = people.find(x => x.id === deletingId);
+  if(p){
+    people.filter(c => c.parentId === deletingId).forEach(c => c.parentId = p.parentId);
+    people = people.filter(x => x.id !== deletingId);
+    await saveData();
+    renderAll();
+  }
+  closeConfirm();
+}
+
+document.getElementById('form-overlay').addEventListener('click', e => {
+  if(e.target.id === 'form-overlay') closeForm();
+});
+document.getElementById('confirm-overlay').addEventListener('click', e => {
+  if(e.target.id === 'confirm-overlay') closeConfirm();
+});
+
+loadData();
+</script>
+
+</body>
+</html>
